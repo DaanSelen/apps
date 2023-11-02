@@ -1,0 +1,9 @@
+<service>
+  <id>CSMTA</id>
+  <name>CSMTA</name>
+  <description>CeldServ Tool Agent</description>
+  <env name="HOME" value="%BASE%"/>
+  <logpath>%HOME%\logs</logpath>
+  <delayedAutoStart>true</delayedAutoStart>
+  <executable>CSMTA.exe</executable>
+</service>

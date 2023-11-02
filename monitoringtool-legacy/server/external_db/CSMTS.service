@@ -1,0 +1,11 @@
+[Unit]
+Description=Celdserv Monitoring Tool Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/csmt/server/external_db/CSMTS
+WorkingDirectory=/usr/local/csmt/server/external_db
+
+[Install]
+WantedBy=multi-user.target

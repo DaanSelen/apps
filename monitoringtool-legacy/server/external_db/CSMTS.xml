@@ -1,0 +1,9 @@
+<service>
+  <id>CSMTS</id>
+  <name>CSMTS</name>
+  <description>Celdserv Monitoring Tool Server</description>
+  <env name="HOME" value="%BASE%"/>
+  <logpath>%HOME%\logs</logpath>
+  <delayedAutoStart>true</delayedAutoStart>
+  <executable>CSMTS.exe</executable>
+</service>

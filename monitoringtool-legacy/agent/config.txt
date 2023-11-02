@@ -1,0 +1,19 @@
+#CSMTAgent Config File, all keyword are in full caps:
+
+#Which Operation do you want to enable?
+CPUENABLED = true
+RAMENABLED = false
+
+#Set this to the value of CPU usage % after which you would like the Agent to take action. (Count)
+#FORMAT = PERCENT(%)
+CPUTHRESHOLD = 0
+RAMTHRESHOLD = 80
+
+#ALERTTIME Is the amount of seconds the CPU usage % has to be above the threshold for the program to report to the main server
+#FORMAT = SECONDS
+CPUALERTTIME = 3
+RAMALERTTIME = 60
+
+#FORMAT = xxx.xxx.xxx.xxx:xxxx, for example 192.168.1.20:1234
+SERVERIP = localhost:2468
+HTTPS = false

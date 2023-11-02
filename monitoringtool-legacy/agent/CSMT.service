@@ -1,0 +1,11 @@
+[Unit]
+Description=Celdserv Monitoring Tool Agent
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/csmt/agent/CSMTA
+WorkingDirectory=/usr/local/csmt/agent
+
+[Install]
+WantedBy=multi-user.target
