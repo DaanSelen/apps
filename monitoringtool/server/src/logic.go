@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 func init() {
@@ -10,8 +11,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Ready")
+	log.Println("Ready")
 	fmt.Scanln()
 }
-
-
