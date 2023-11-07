@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
-func main() {
-	fmt.Println("LOl ur gay")
+func init() {
+	initDB()
+	initHTTP()
 }
+
+func main() {
+	fmt.Println("Ready")
+	fmt.Scanln()
+}
+
+
