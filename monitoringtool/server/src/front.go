@@ -14,9 +14,12 @@ func initHTTP() {
 	//Basic endpoints
 	NMTA.HandleFunc("/", rootEnd).Methods("GET")
 	//Account endpoints
-	NMTA.HandleFunc("/account/create", accountMani("create")).Methods("GET")
-	NMTA.HandleFunc("/account/change", accountMani("change")).Methods("GET")
-	NMTA.HandleFunc("/account/remove", accountMani("remove")).Methods("GET")
+	NMTA.HandleFunc("/account/create", accountMani("create")).Methods("POST")
+	NMTA.HandleFunc("/account/change", accountMani("change")).Methods("PATCH")
+	NMTA.HandleFunc("/account/remove", accountMani("remove")).Methods("DELETE")
+	//Agent register endpoint
+	NMTA.HandleFunc("/agent/register", accountMani("create")).Methods("POST")
+	NMTA.HandleFunc("/agent/deregister", accountMani("remove")).Methods("DELETE")
 
 	go http.ListenAndServe((":9113"), NMTA)
 }

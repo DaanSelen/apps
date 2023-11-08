@@ -8,11 +8,19 @@ import (
 )
 
 var (
-	createAgentTable string = `
+	accountTable string = `
 	CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    email TEXT
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		username TEXT,
+		password TEXT,
+		 TEXT,
+		)`
+	agentTable string = `
+	CREATE TABLE IF NOT EXISTS users (
+    	id INTEGER PRIMARY KEY AUTOINCREMENT,
+    	agentHostname TEXT,
+    	signupDate TEXT,
+		operatingSystem TEXT,
 	)`
 )
 
@@ -23,12 +31,11 @@ func initDB() {
 	}
 	defer db.Close()
 
-	//Test the DB Connection
-	err = db.Ping()
+	err = db.Ping() //Test the DB Connection to see if it works.
 	if err != nil {
 		log.Fatal("Failed to ping the database:", err)
 	} else {
-		db.Exec(createAgentTable) //Create first table containing agent information
+		db.Exec(agentTable) //Create first table containing agent information. Listed above.
 
 		log.Println("FINISHING INSERTING FIRST TABLES")
 	}
