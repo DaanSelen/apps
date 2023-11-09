@@ -81,7 +81,6 @@ func insertAccount(username, securedPassword, randomSalt string) bool {
 }
 
 func alterAccount(username, password, randomSalt string) {
-	log.Println(password, randomSalt)
 	stmnt, _ := db.Prepare("UPDATE users SET password = ?, salt = ? WHERE username = ?;")
 	defer stmnt.Close()
 	stmnt.Exec(password, randomSalt, username)

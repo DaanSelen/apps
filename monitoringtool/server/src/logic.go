@@ -56,6 +56,7 @@ func changeAccount(username, password, option string) bool {
 		log.Println(infop, "Passwords match, user:", username, "authenticated.")
 		securedPassword, randomSalt := securePassword(option)
 		alterAccount(username, securedPassword, randomSalt)
+		log.Println(infop, "Account alteration succesful, altered password for user:", username)
 		return true
 	} else {
 		log.Println(warnp, "Passwords do not match or user does not exist, access denied.")
