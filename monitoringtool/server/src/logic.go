@@ -11,6 +11,6 @@ func init() {
 }
 
 func main() {
-	log.Println("Ready")
+	log.Println(infop, "Ready for incomming connections on port: "+listenPort)
 	fmt.Scanln()
 }

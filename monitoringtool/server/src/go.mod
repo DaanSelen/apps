@@ -1,4 +1,4 @@
-module NMA
+module NMAS
 
 go 1.21.0
 

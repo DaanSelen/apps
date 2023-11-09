@@ -25,18 +25,19 @@ var (
 )
 
 func initDB() {
-	db, err := sql.Open("sqlite3", "monitor.db")
+	db, err := sql.Open("sqlite3", "NMASDB.db")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errop, err)
 	}
 	defer db.Close()
 
 	err = db.Ping() //Test the DB Connection to see if it works.
 	if err != nil {
-		log.Fatal("Failed to ping the database:", err)
+		log.Fatal(errop, "Failed to ping the database:", err)
 	} else {
-		db.Exec(agentTable) //Create first table containing agent information. Listed above.
+		db.Exec(accountTable) //Create first table containing account information, listed above.
+		db.Exec(agentTable)   //Create first table containing agent information, listed above.
 
-		log.Println("FINISHING INSERTING FIRST TABLES")
+		log.Println(infop, "NMTAS SQLite3 Database: Ready for connections.")
 	}
 }
