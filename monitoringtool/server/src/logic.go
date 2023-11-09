@@ -47,9 +47,12 @@ func createAccount(username, password string) bool {
 func removeAccount(username, password string) bool {
 	log.Println(infop, "Received request for account deletion, user:", username+".")
 	if authenticateAccount(username, password) {
-		log.Println(infop, "Passwords match, user authenticated.")
+		log.Println(infop, "Passwords match, user:", username, "authenticated.")
+		dropAccount(username)
+		log.Println(infop, "Account deletion succesful, removed user:", username)
 		return true
 	} else {
+		log.Println(warnp, "Passwords do not match or user does not exist, access denied.")
 		return false
 	}
 }

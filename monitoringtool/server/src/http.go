@@ -65,7 +65,7 @@ func accountMani(command string) http.HandlerFunc {
 				status := createAccount(requestBody.Username, requestBody.Password)
 				if status {
 					w.WriteHeader(http.StatusOK)
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully created an account for user: " + requestBody.Username)}) //Using the predefined struct above we respond in JSON to the request.
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully created an account for user: " + requestBody.Username + ".")}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusConflict)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusConflict, Message: "Creation failed, user: " + requestBody.Username + " exists."}) //Using the predefined struct above we respond in JSON to the request.
@@ -73,7 +73,13 @@ func accountMani(command string) http.HandlerFunc {
 			case "change":
 				log.Println(infop, "2 OPTON")
 			case "remove":
-				removeAccount(requestBody.Username, requestBody.Password)
+				if removeAccount(requestBody.Username, requestBody.Password) {
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully removed account: " + requestBody.Username + ".")}) //Using the predefined struct above we respond in JSON to the request.
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Deletion failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
+				}
 			}
 		}
 	}

@@ -16,14 +16,14 @@ const (
 		username TEXT,
 		password TEXT,
 		salt TEXT
-		)`
+		);`
 	agentTable = `
 	CREATE TABLE IF NOT EXISTS agents (
     	id INTEGER PRIMARY KEY AUTOINCREMENT,
     	agentHostname TEXT,
     	signupDate TEXT,
 		operatingSystem TEXT
-	)`
+	);`
 )
 
 func initDB() {
@@ -56,7 +56,7 @@ func checkUserDuplicate(keyword string) bool {
 
 func retrieveSalt(username string) (bool, string) {
 	var randomSalt string
-	db.QueryRow("SELECT salt FROM users WHERE username = '" + username + "'").Scan(&randomSalt)
+	db.QueryRow("SELECT salt FROM users WHERE username = '" + username + "';").Scan(&randomSalt)
 	if len(randomSalt) == 0 {
 		return false, "Failed to find user: " + username
 	} else {
@@ -66,16 +66,22 @@ func retrieveSalt(username string) (bool, string) {
 
 func retrievePasswordhash(username string) string {
 	var passwordHash string
-	db.QueryRow("SELECT password FROM users WHERE username = '" + username + "'").Scan(&passwordHash)
+	db.QueryRow("SELECT password FROM users WHERE username = '" + username + "';").Scan(&passwordHash)
 	return passwordHash
 }
 
 func insertAccount(username, securedPassword, randomSalt string) bool {
 	if !checkUserDuplicate(username) {
-		statement, _ := db.Prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)")
-		statement.Exec(username, securedPassword, randomSalt)
+		stmnt, _ := db.Prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?);")
+		stmnt.Exec(username, securedPassword, randomSalt)
 		return true
 	} else {
 		return false
 	}
+}
+
+func dropAccount(username string) {
+	stmnt, _ := db.Prepare("DELETE FROM users WHERE username = ?;")
+	defer stmnt.Close()
+	stmnt.Exec(username)
 }
