@@ -17,7 +17,17 @@ func main() {
 }
 
 func createAccount(username, password string) string {
-	log.Println("GOT VALUES:", username, password)
+	log.Println(infop, "Received request for account creation, user:", username)
 	securedPassword, randomSalt := securePassword(password)
-	return insertAccount(username, securedPassword, randomSalt)
+	if status := insertAccount(username, securedPassword, randomSalt); status == "SUCCESS" {
+		log.Println(infop, "Successfully created account for user:", username)
+		return status
+	} else {
+		log.Println(warnp, "Failed to create account because of duplicate username.")
+		return status
+	}
 }
+
+/*func authenticateAccount() {
+
+}*/

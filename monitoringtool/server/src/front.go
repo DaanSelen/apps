@@ -46,6 +46,7 @@ func initHTTP() {
 func rootEnd(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+
 	log.Println(infop, "ROOT HIT") //Comment out later, for debugging purposes
 	json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Nerthus Monitor Application Server REST-API. Version 0.01"})
 }
@@ -53,6 +54,7 @@ func rootEnd(w http.ResponseWriter, r *http.Request) {
 func accountMani(command string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+
 		var requestBody accountMessage
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -60,7 +62,6 @@ func accountMani(command string) http.HandlerFunc {
 		} else {
 			switch command {
 			case "create":
-				log.Println(infop, "Creating account for user:", requestBody.Username)
 				status := createAccount(requestBody.Username, requestBody.Password)
 				if status == "SUCCESS" {
 					w.WriteHeader(http.StatusOK)
