@@ -54,12 +54,28 @@ func checkUserDuplicate(keyword string) bool {
 	}
 }
 
-func insertAccount(username, securedPassword, randomSalt string) string {
+func retrieveSalt(username string) (bool, string) {
+	var randomSalt string
+	db.QueryRow("SELECT salt FROM users WHERE username = '" + username + "'").Scan(&randomSalt)
+	if len(randomSalt) == 0 {
+		return false, "Failed to find user: " + username
+	} else {
+		return true, randomSalt
+	}
+}
+
+func retrievePasswordhash(username string) string {
+	var passwordHash string
+	db.QueryRow("SELECT password FROM users WHERE username = '" + username + "'").Scan(&passwordHash)
+	return passwordHash
+}
+
+func insertAccount(username, securedPassword, randomSalt string) bool {
 	if !checkUserDuplicate(username) {
 		statement, _ := db.Prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)")
 		statement.Exec(username, securedPassword, randomSalt)
-		return "SUCCESS"
+		return true
 	} else {
-		return "FAILED, USERNAME EXISTS"
+		return false
 	}
 }
