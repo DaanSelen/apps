@@ -8,17 +8,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type infoMessage struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 const (
 	listenPort = "9113"
 	infop      = "[Info]"
 	warnp      = "[Warn]"
 	errop      = "[Error]"
 )
+
+type accountMessage struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Option   string `json:"option"`
+}
+
+type infoMessage struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
 
 func initHTTP() {
 	NMTA := mux.NewRouter().StrictSlash(true)
@@ -40,20 +46,34 @@ func initHTTP() {
 func rootEnd(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	returnMessage := infoMessage{Code: http.StatusOK, Message: "Nerthus Monitor Application Server REST-API. Version 0.01"}
 	log.Println(infop, "ROOT HIT") //Comment out later, for debugging purposes
-	json.NewEncoder(w).Encode(returnMessage)
+	json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Nerthus Monitor Application Server REST-API. Version 0.01"})
 }
 
 func accountMani(command string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		switch command {
-		case "create":
-			log.Println(infop, "1 OPTON")
-		case "change":
-			log.Println(infop, "2 OPTON")
-		case "remove":
-			log.Println(infop, "3 OPTON")
+		w.Header().Set("Content-Type", "application/json")
+		var requestBody accountMessage
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err.Error())
+		} else {
+			switch command {
+			case "create":
+				log.Println(infop, "Creating account for user:", requestBody.Username)
+				status := createAccount(requestBody.Username, requestBody.Password)
+				if status == "SUCCESS" {
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully created an account for user: " + requestBody.Username)}) //Using the predefined struct above we respond in JSON to the request.
+				} else {
+					w.WriteHeader(http.StatusConflict)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusConflict, Message: status}) //Using the predefined struct above we respond in JSON to the request.
+				}
+			case "change":
+				log.Println(infop, "2 OPTON")
+			case "remove":
+				log.Println(infop, "3 OPTON")
+			}
 		}
 	}
 }
