@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+const (
+	infop = "[Info]"
+	warnp = "[Warn]"
+	errop = "[Error]"
+)
+
 func init() {
 	initDB()
 	initHTTP()
@@ -41,6 +47,20 @@ func createAccount(username, password string) bool {
 	} else {
 		log.Println(warnp, "Failed to create account because of duplicate username.")
 		return status
+	}
+}
+
+func changeAccount(username, password, option string) bool {
+	log.Println(infop, "Received request for account change, user:", username+".")
+	if authenticateAccount(username, password) {
+		log.Println(infop, "Passwords match, user:", username, "authenticated.")
+		securedPassword, randomSalt := securePassword(option)
+		alterAccount(username, securedPassword, randomSalt)
+		log.Println(infop, "Account alteration succesful, altered password for user:", username)
+		return true
+	} else {
+		log.Println(warnp, "Passwords do not match or user does not exist, access denied.")
+		return false
 	}
 }
 

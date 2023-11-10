@@ -7,12 +7,10 @@ do
         port) port=${OPTARG};;
     esac
 done
-UserID=$(id -u $username)
 if [ -z "$username" ] || [ -z "$containername" ] || [ -z $port ]
 then
     echo $port
     echo "Missing argument"
 else
-    docker run -it -d --name $containername --user $UserID -v /usr/local/nwrs/web/$username/html:/usr/share/nginx/html -p $port:8080 nginxinc/nginx-unprivileged:latest
+    docker run -it -d --name $containername --user $(id -u $username) -v /usr/local/nwrs/web/$username/html:/usr/share/nginx/html -p $port:8080 nginxinc/nginx-unprivileged:latest
 fi
-

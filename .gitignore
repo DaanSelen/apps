@@ -1,1 +1,3 @@
 monitoringtool/server/*.db
+monitoringtool/server/src/*.db
+

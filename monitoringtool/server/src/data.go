@@ -80,6 +80,12 @@ func insertAccount(username, securedPassword, randomSalt string) bool {
 	}
 }
 
+func alterAccount(username, password, randomSalt string) {
+	stmnt, _ := db.Prepare("UPDATE users SET password = ?, salt = ? WHERE username = ?;")
+	defer stmnt.Close()
+	stmnt.Exec(password, randomSalt, username)
+}
+
 func dropAccount(username string) {
 	stmnt, _ := db.Prepare("DELETE FROM users WHERE username = ?;")
 	defer stmnt.Close()
