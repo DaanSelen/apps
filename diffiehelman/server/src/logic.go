@@ -16,7 +16,7 @@ func main() {
 	defer connection.Close()
 	buffer := make([]byte, 1024)
 
-	log.Print("READY FOR DHKEX, WAITING FOR MESSAGES")
+	log.Print("SERVER IS READY FOR DHKEX, WAITING FOR MESSAGES")
 	readIncomming(connection, buffer)
 }
 
@@ -27,7 +27,8 @@ func readIncomming(conn *net.UDPConn, buffer []byte) {
 	for {
 		n, addr, _ := conn.ReadFromUDP(buffer)
 		if strings.TrimSpace(string(buffer[:n])) == "INITDIFFIE" {
-			log.Print("ACTIVATED DHKEX")
+			log.Print(strings.Repeat("-", 100))
+			log.Println("ACTIVATED DHKEX")
 			active = 1
 		}
 
@@ -67,4 +68,6 @@ func initDiffie(conn *net.UDPConn, addr *net.UDPAddr, initVals [4]string) {
 	log.Print("SHARED SECRET: ", K, " READY TO CREATE KEY")
 	log.Println("VERBOSE VALUE INIT:", b, g, p)
 	log.Println("VERBOSE VALUE WORK:", A, B)
+
+	log.Println(strings.Repeat("-", 100))
 }

@@ -23,7 +23,7 @@ func main() {
 
 	fmt.Printf("The UDP server is %s\n", conn.RemoteAddr().String())
 	defer conn.Close()
-	log.Println("READY FOR DHKEX, WAITING FOR MESSAGES")
+	log.Println("CLIENT IS READY FOR DHKEX, WAITING FOR COMMANDS")
 
 	go readRespone(conn)
 
@@ -48,7 +48,7 @@ func readRespone(conn *net.UDPConn) {
 	for {
 		buffer := make([]byte, 1024)
 		n, _, _ := conn.ReadFromUDP(buffer)
-		if strings.Contains(string(buffer[:n]), "Return") {
+		if strings.Contains(string(buffer[:n]), "Return:") {
 			B, _ = new(big.Int).SetString(string((buffer[:n])[7:]), 10)
 			log.Println("GOT PEER RETURN VALUE:", B)
 		}
@@ -62,7 +62,8 @@ func initDiffie(conn *net.UDPConn) {
 
 	A := new(big.Int).Exp(g, a, p)
 
-	log.Println("ACTIVATING DHKEX")
+	log.Println(strings.Repeat("-", 100))
+	log.Println("ACTIVATING DHKEX SENDING VARIABLES")
 
 	conn.Write([]byte("INITDIFFIE"))
 	vals := []*big.Int{A, g, p}
@@ -71,7 +72,8 @@ func initDiffie(conn *net.UDPConn) {
 		conn.Write(data)
 	}
 
-	time.Sleep(100 * time.Nanosecond)
+	time.Sleep(100 * time.Millisecond)
+
 	if B != nil {
 		K := new(big.Int).Exp(B, a, p)
 		log.Println("SHARED SECRET:", K, "READY TO CREATE KEY")
@@ -80,4 +82,5 @@ func initDiffie(conn *net.UDPConn) {
 	} else {
 		log.Println("B NOT RECEIVED.")
 	}
+	log.Println(strings.Repeat("-", 100))
 }
