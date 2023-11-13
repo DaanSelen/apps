@@ -12,6 +12,11 @@ const (
 	listenPort = "9113"
 )
 
+type infoMessage struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 type accountMessage struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -19,15 +24,12 @@ type accountMessage struct {
 }
 
 type agentMessage struct {
-	AgentFriendly string `json:"agentfriendly"`
+	AgentManager  string `json:"agentmanager"`
+	AccessToken   string `json:"accesstoken"`
 	AgentHostname string `json:"agenthostname"`
 	AgentOS       string `json:"agentos"`
-	AgentRegDate  string `json:"agentregdate"`
-}
-
-type infoMessage struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	AgentIP       string `json:"agentip"`
+	AgentDate     string `json:"agentdate"`
 }
 
 func initHTTP() {
@@ -39,9 +41,10 @@ func initHTTP() {
 	NMTA.HandleFunc("/account/create", accountMani("create")).Methods("POST")
 	NMTA.HandleFunc("/account/change", accountMani("change")).Methods("PATCH")
 	NMTA.HandleFunc("/account/remove", accountMani("remove")).Methods("DELETE")
+	NMTA.HandleFunc("/account/accesstoken", accountMani("accesstoken")).Methods("GET")
 	//Agent register endpoint
-	NMTA.HandleFunc("/agent/register", agentMani("create")).Methods("POST")
-	NMTA.HandleFunc("/agent/deregister", agentMani("remove")).Methods("DELETE")
+	NMTA.HandleFunc("/agent/register", agentMani("register")).Methods("POST")
+	NMTA.HandleFunc("/agent/deregister", agentMani("deregister")).Methods("DELETE")
 
 	go http.ListenAndServe((":" + listenPort), NMTA)
 	log.Println(infop, "NMTAS HTTP REST-API, Ready for connections.")
@@ -90,6 +93,11 @@ func accountMani(command string) http.HandlerFunc {
 					w.WriteHeader(http.StatusUnauthorized)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Deletion failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
+			case "accesstoken":
+				if status, userToken := getUserToken(requestBody.Username, requestBody.Password); status {
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: userToken}) //Using the predefined struct above we respond in JSON to the request.
+				}
 			}
 		}
 	}
@@ -106,9 +114,16 @@ func agentMani(command string) http.HandlerFunc {
 		} else {
 			switch command {
 			case "register":
-				registerAgent(requestBody.AgentHostname, requestBody.AgentOS, requestBody.AgentRegDate)
+				if registerAgent(requestBody.AgentManager, requestBody.AccessToken, requestBody.AgentHostname, requestBody.AgentOS, requestBody.AgentIP, requestBody.AgentDate) {
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Succesfully registered agent to manager."}) //Using the predefined struct above we respond in JSON to the request.
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access tken was incorrect or manager account does not exist."}) //Using the predefined struct above we respond in JSON to the request.
+				}
 			case "deregister":
-				deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)
+				//deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)
+				log.Println("Bigger Nalls")
 			}
 		}
 	}
