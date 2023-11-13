@@ -20,10 +20,14 @@ const (
 	agentTable = `
 	CREATE TABLE IF NOT EXISTS agents (
     	id INTEGER PRIMARY KEY AUTOINCREMENT,
+		agentFriendly TEXT,
     	agentHostname TEXT,
     	signupDate TEXT,
 		operatingSystem TEXT
 	);`
+
+	userTableName  = "users"
+	agentTableName = "agents"
 )
 
 func initDB() {
@@ -44,9 +48,9 @@ func initDB() {
 	}
 }
 
-func checkUserDuplicate(keyword string) bool {
+func checkDuplicate(keyword, table string) bool {
 	var counter int
-	db.QueryRow("SELECT COUNT(*) FROM users WHERE username = '" + keyword + "';").Scan(&counter)
+	db.QueryRow("SELECT COUNT(*) FROM " + table + " WHERE username = '" + keyword + "';").Scan(&counter)
 	if counter == 0 {
 		return false
 	} else {
@@ -71,7 +75,7 @@ func retrievePasswordhash(username string) string {
 }
 
 func insertAccount(username, securedPassword, randomSalt string) bool {
-	if !checkUserDuplicate(username) {
+	if !checkDuplicate(username, userTableName) {
 		stmnt, _ := db.Prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?);")
 		stmnt.Exec(username, securedPassword, randomSalt)
 		return true

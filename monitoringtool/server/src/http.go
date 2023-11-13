@@ -18,6 +18,13 @@ type accountMessage struct {
 	Option   string `json:"option"`
 }
 
+type agentMessage struct {
+	AgentFriendly string `json:"agentfriendly"`
+	AgentHostname string `json:"agenthostname"`
+	AgentOS       string `json:"agentos"`
+	AgentRegDate  string `json:"agentregdate"`
+}
+
 type infoMessage struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -33,8 +40,8 @@ func initHTTP() {
 	NMTA.HandleFunc("/account/change", accountMani("change")).Methods("PATCH")
 	NMTA.HandleFunc("/account/remove", accountMani("remove")).Methods("DELETE")
 	//Agent register endpoint
-	NMTA.HandleFunc("/agent/register", accountMani("create")).Methods("POST")
-	NMTA.HandleFunc("/agent/deregister", accountMani("remove")).Methods("DELETE")
+	NMTA.HandleFunc("/agent/register", agentMani("create")).Methods("POST")
+	NMTA.HandleFunc("/agent/deregister", agentMani("remove")).Methods("DELETE")
 
 	go http.ListenAndServe((":" + listenPort), NMTA)
 	log.Println(infop, "NMTAS HTTP REST-API, Ready for connections.")
@@ -83,6 +90,25 @@ func accountMani(command string) http.HandlerFunc {
 					w.WriteHeader(http.StatusUnauthorized)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Deletion failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
+			}
+		}
+	}
+}
+
+func agentMani(command string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		var requestBody agentMessage
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err.Error())
+		} else {
+			switch command {
+			case "register":
+				registerAgent(requestBody.AgentHostname, requestBody.AgentOS, requestBody.AgentRegDate)
+			case "deregister":
+				deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)
 			}
 		}
 	}
