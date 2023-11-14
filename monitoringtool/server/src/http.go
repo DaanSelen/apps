@@ -69,8 +69,7 @@ func accountMani(command string) http.HandlerFunc {
 		} else {
 			switch command {
 			case "create": //Create a new account and store the given password (or password hash) securely with an added salt using SHA3-512.
-				status := createAccount(requestBody.Username, requestBody.Password)
-				if status {
+				if createAccount(requestBody.Username, requestBody.Password) {
 					w.WriteHeader(http.StatusOK)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully created an account for user: " + requestBody.Username + ".")}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
