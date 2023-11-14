@@ -119,12 +119,12 @@ func agentMani(command string) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Succesfully registered agent to manager."}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					log.Println("LOL NO")
+					log.Println("Unauthorized")
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access token was incorrect or manager account does not exist."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			case "deregister":
 				//deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)
-				log.Println("Bigger Nalls")
+				log.Println("Deregister")
 			}
 		}
 	}
