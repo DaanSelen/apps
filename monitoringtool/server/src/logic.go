@@ -15,12 +15,14 @@ const (
 )
 
 func init() {
+	log.Println(strings.Repeat("-", 100))
 	initDB()
 	initHTTP()
 }
 
 func main() {
-	log.Println(infop, "Ready for incomming connections on port: "+listenPort+".\n"+strings.Repeat("-", 100))
+	log.Println(infop, "Ready for incomming connections on port: "+listenPort+".")
+	log.Println(strings.Repeat("-", 100))
 	fmt.Scanln()
 }
 
@@ -92,7 +94,11 @@ func getUserToken(username, password string) (bool, string) {
 func registerAgent(agentManager, candidateAccessToken, agentHostname, agentOS, agentIP, agentSignDate string) bool {
 	accessToken := retrieveUserToken(agentManager)
 	if candidateAccessToken == accessToken {
-		return true
+		if insertAgent(agentManager, agentHostname, agentOS, agentIP, agentSignDate) {
+			return true
+		} else {
+			return false
+		}
 	} else {
 		return false
 	}

@@ -83,7 +83,7 @@ func accountMani(command string) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully changed password for user: " + requestBody.Username + ".")}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Deletion failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Account change failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			case "remove": //Check if the entered credentials are (when rehashed) equal to the stored credentials, if correct initiate account deletion.
 				if removeAccount(requestBody.Username, requestBody.Password) {
@@ -119,7 +119,8 @@ func agentMani(command string) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Succesfully registered agent to manager."}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access tken was incorrect or manager account does not exist."}) //Using the predefined struct above we respond in JSON to the request.
+					log.Println("LOL NO")
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access token was incorrect or manager account does not exist."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			case "deregister":
 				//deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)

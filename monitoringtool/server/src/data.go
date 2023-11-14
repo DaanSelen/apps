@@ -16,20 +16,22 @@ const (
 		user	 	TEXT,
 		password 	TEXT,
 		salt 		TEXT,
-		accesstoken TEXT
+		accessToken TEXT
 		);`
 	agentTable = `
 	CREATE TABLE IF NOT EXISTS agents (
     	id 				INTEGER PRIMARY KEY AUTOINCREMENT,
-		manageraccount 	TEXT,
-    	agentHostname 	TEXT,
-		agentAddress 	TEXT,
-    	signupDate 		TEXT,
-		operatingSystem TEXT
+		manager			TEXT,
+    	hostname 		TEXT,
+		operatingSystem TEXT,
+		ipAddress 		TEXT,
+		signupDate		TEXT
 	);`
 
-	userTableName  = "users"
-	agentTableName = "agents"
+	userTableName   = "users"
+	userColumnName  = "user"
+	agentTableName  = "agents"
+	agentColumnHost = "hostname"
 )
 
 func initDB() {
@@ -50,9 +52,9 @@ func initDB() {
 	}
 }
 
-func checkDuplicate(keyword, table string) bool {
+func checkDuplicate(keyword, columnname, table string) bool {
 	var counter int
-	db.QueryRow("SELECT COUNT(*) FROM " + table + " WHERE username = '" + keyword + "';").Scan(&counter)
+	db.QueryRow("SELECT COUNT(*) FROM " + table + " WHERE " + columnname + " = '" + keyword + "';").Scan(&counter)
 	if counter == 0 {
 		return false
 	} else {
@@ -83,8 +85,8 @@ func retrieveUserToken(username string) string {
 }
 
 func insertAccount(username, securedPassword, randomSalt, joinToken string) bool {
-	if !checkDuplicate(username, userTableName) {
-		stmnt, _ := db.Prepare("INSERT INTO users (user, password, salt, accesstoken) VALUES (?, ?, ?, ?);")
+	if !checkDuplicate(username, userColumnName, userTableName) {
+		stmnt, _ := db.Prepare("INSERT INTO users (user, password, salt, accessToken) VALUES (?, ?, ?, ?);")
 		stmnt.Exec(username, securedPassword, randomSalt, joinToken)
 		return true
 	} else {
@@ -102,4 +104,15 @@ func dropAccount(username string) {
 	stmnt, _ := db.Prepare("DELETE FROM users WHERE user = ?;")
 	defer stmnt.Close()
 	stmnt.Exec(username)
+}
+
+func insertAgent(agentManager, agentHostname, agentOS, agentIP, signupDate string) bool {
+	if !checkDuplicate(agentHostname, agentColumnHost, agentTable) {
+		stmnt, _ := db.Prepare("INSERT INTO agents (manager, hostname, operatingSystem, ipAddress, signupDate) VALUES (?, ?, ?, ?, ?);")
+		defer stmnt.Close()
+		stmnt.Exec(agentManager, agentHostname, agentOS, agentIP, signupDate)
+		return true
+	} else {
+		return false
+	}
 }
