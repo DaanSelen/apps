@@ -11,11 +11,16 @@ const (
 	PW_SALT_LEN = 32
 )
 
-func securePassword(password string) (string, string) {
-	randomSalt := make([]byte, PW_SALT_LEN)
+func generateRandomString(len int) string {
+	randomSalt := make([]byte, len)
 	rand.Read(randomSalt)
-	securedPassword := generateHash(password + base64.StdEncoding.EncodeToString(randomSalt))
-	return securedPassword, base64.StdEncoding.EncodeToString(randomSalt)
+	return base64.StdEncoding.EncodeToString(randomSalt)
+}
+
+func securePassword(password string) (string, string) {
+	randomSalt := generateRandomString(PW_SALT_LEN)
+	securedPassword := generateHash(password + randomSalt)
+	return securedPassword, randomSalt
 }
 
 func generateHash(candidate string) string {

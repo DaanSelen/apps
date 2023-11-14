@@ -12,18 +12,26 @@ var db *sql.DB
 const (
 	userTable = `
 	CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		username TEXT,
-		password TEXT,
-		salt TEXT
+		id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+		user	 	TEXT,
+		password 	TEXT,
+		salt 		TEXT,
+		accessToken TEXT
 		);`
 	agentTable = `
 	CREATE TABLE IF NOT EXISTS agents (
-    	id INTEGER PRIMARY KEY AUTOINCREMENT,
-    	agentHostname TEXT,
-    	signupDate TEXT,
-		operatingSystem TEXT
+    	id 				INTEGER PRIMARY KEY AUTOINCREMENT,
+		manager			TEXT,
+    	hostname 		TEXT,
+		operatingSystem TEXT,
+		ipAddress 		TEXT,
+		signupDate		TEXT
 	);`
+
+	userTableName   = "users"
+	userColumnName  = "user"
+	agentTableName  = "agents"
+	agentColumnHost = "hostname"
 )
 
 func initDB() {
@@ -40,13 +48,13 @@ func initDB() {
 		db.Exec(userTable)  //Create first table containing account information, listed above.
 		db.Exec(agentTable) //Create first table containing agent information, listed above.
 
-		log.Println(infop, "NMTAS SQLite3 Database: Ready for connections.")
+		log.Println(infop, "NMTAS SQLite3 Database, Ready for connections.")
 	}
 }
 
-func checkUserDuplicate(keyword string) bool {
+func checkDuplicate(keyword, columnname, table string) bool {
 	var counter int
-	db.QueryRow("SELECT COUNT(*) FROM users WHERE username = '" + keyword + "';").Scan(&counter)
+	db.QueryRow("SELECT COUNT(*) FROM " + table + " WHERE " + columnname + " = '" + keyword + "';").Scan(&counter)
 	if counter == 0 {
 		return false
 	} else {
@@ -56,7 +64,7 @@ func checkUserDuplicate(keyword string) bool {
 
 func retrieveSalt(username string) (bool, string) {
 	var randomSalt string
-	db.QueryRow("SELECT salt FROM users WHERE username = '" + username + "';").Scan(&randomSalt)
+	db.QueryRow("SELECT salt FROM users WHERE user = '" + username + "';").Scan(&randomSalt)
 	if len(randomSalt) == 0 {
 		return false, "Failed to find user: " + username
 	} else {
@@ -66,14 +74,20 @@ func retrieveSalt(username string) (bool, string) {
 
 func retrievePasswordhash(username string) string {
 	var passwordHash string
-	db.QueryRow("SELECT password FROM users WHERE username = '" + username + "';").Scan(&passwordHash)
+	db.QueryRow("SELECT password FROM users WHERE user = '" + username + "';").Scan(&passwordHash)
 	return passwordHash
 }
 
-func insertAccount(username, securedPassword, randomSalt string) bool {
-	if !checkUserDuplicate(username) {
-		stmnt, _ := db.Prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?);")
-		stmnt.Exec(username, securedPassword, randomSalt)
+func retrieveUserToken(username string) string {
+	var accessToken string
+	db.QueryRow("SELECT accesstoken FROM users WHERE user = '" + username + "';").Scan(&accessToken)
+	return accessToken
+}
+
+func insertAccount(username, securedPassword, randomSalt, joinToken string) bool {
+	if !checkDuplicate(username, userColumnName, userTableName) {
+		stmnt, _ := db.Prepare("INSERT INTO users (user, password, salt, accessToken) VALUES (?, ?, ?, ?);")
+		stmnt.Exec(username, securedPassword, randomSalt, joinToken)
 		return true
 	} else {
 		return false
@@ -81,13 +95,24 @@ func insertAccount(username, securedPassword, randomSalt string) bool {
 }
 
 func alterAccount(username, password, randomSalt string) {
-	stmnt, _ := db.Prepare("UPDATE users SET password = ?, salt = ? WHERE username = ?;")
+	stmnt, _ := db.Prepare("UPDATE users SET password = ?, salt = ? WHERE user = ?;")
 	defer stmnt.Close()
 	stmnt.Exec(password, randomSalt, username)
 }
 
 func dropAccount(username string) {
-	stmnt, _ := db.Prepare("DELETE FROM users WHERE username = ?;")
+	stmnt, _ := db.Prepare("DELETE FROM users WHERE user = ?;")
 	defer stmnt.Close()
 	stmnt.Exec(username)
+}
+
+func insertAgent(agentManager, agentHostname, agentOS, agentIP, signupDate string) bool {
+	if !checkDuplicate(agentHostname, agentColumnHost, agentTable) {
+		stmnt, _ := db.Prepare("INSERT INTO agents (manager, hostname, operatingSystem, ipAddress, signupDate) VALUES (?, ?, ?, ?, ?);")
+		defer stmnt.Close()
+		stmnt.Exec(agentManager, agentHostname, agentOS, agentIP, signupDate)
+		return true
+	} else {
+		return false
+	}
 }
