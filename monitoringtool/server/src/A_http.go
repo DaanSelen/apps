@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	listenPort = "9113"
+	listenPortHttp string = "9113"
 )
 
 type infoMessage struct {
@@ -46,8 +46,8 @@ func initHTTP() {
 	NMTA.HandleFunc("/agent/register", agentMani("register")).Methods("POST")
 	NMTA.HandleFunc("/agent/deregister", agentMani("deregister")).Methods("DELETE")
 
-	go http.ListenAndServe((":" + listenPort), NMTA)
-	log.Println(infop, "NMTAS HTTP REST-API, Ready for connections.")
+	go http.ListenAndServe((":" + listenPortHttp), NMTA)
+	log.Println(infop, "NMTAS HTTP REST-API, Ready for connections on port:", listenPortHttp)
 }
 
 func rootEnd(w http.ResponseWriter, r *http.Request) {

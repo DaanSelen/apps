@@ -17,12 +17,11 @@ const (
 func init() {
 	log.Println(strings.Repeat("-", 100))
 	initDB()
-	initHTTP()
+	go initTLS()
+	go initHTTP()
 }
 
 func main() {
-	log.Println(infop, "Ready for incomming connections on port: "+listenPort+".")
-	log.Println(strings.Repeat("-", 100))
 	fmt.Scanln()
 }
 
