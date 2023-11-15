@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+const (
+	minInitVal = 200
+	maxInitVal = 1000
+)
+
 func main() {
 	var address string = "192.168.178.30:6800"
 
@@ -53,7 +58,7 @@ func readIncomming(conn *net.UDPConn, buffer []byte) {
 }
 
 func initDiffie(conn *net.UDPConn, addr *net.UDPAddr, initVals [4]string) {
-	b, _ := generateRandomPrime(big.NewInt(50), big.NewInt(200))
+	b, _ := generateRandomPrime(big.NewInt(minInitVal), big.NewInt(maxInitVal))
 	A, _ := new(big.Int).SetString(initVals[0], 10)
 	g, _ := new(big.Int).SetString(initVals[1], 10)
 	p, _ := new(big.Int).SetString(initVals[2], 10)
