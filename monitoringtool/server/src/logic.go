@@ -20,7 +20,7 @@ const (
 func init() {
 	log.Println(strings.Repeat("-", 100))
 	initDB()
-	createAdminAccount()
+	go createAdminAccount()
 	go initTLS()
 	go initHTTP()
 }
@@ -32,10 +32,10 @@ func main() {
 func createAdminAccount() {
 	adminToken := generateRandomString(JOINTOKEN_LEN)
 	if status := insertAccount(adminUsername, "", "", adminToken); status {
-		log.Println(infop, "Inserted Admin account.")
+		log.Println(infop, "Inserted Admin account. Access token:")
 		log.Println(infop, adminToken)
 	} else {
-		log.Println(infop, "Admin account already exists")
+		log.Println(infop, "Admin account already exists, not redoing.")
 	}
 }
 

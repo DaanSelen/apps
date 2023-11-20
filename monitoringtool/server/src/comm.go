@@ -8,12 +8,14 @@ import (
 )
 
 const (
-	listenPortTls string = "9114"
+	listenPortTls    string = "9114"
+	tcpServerTLSCert string = "../certs/tls.crt"
+	tcpServerTLSKey  string = "../certs/tls.key"
 )
 
 func initTLS() {
 	config := &tls.Config{
-		Certificates: []tls.Certificate{loadTLSCertificate("tls.crt", "tls.key")},
+		Certificates: []tls.Certificate{loadTLSCertificate(tcpServerTLSCert, tcpServerTLSKey)},
 	}
 
 	listener, err := tls.Listen("tcp", ":"+listenPortTls, config)
@@ -54,10 +56,10 @@ func handleConnection(conn net.Conn) {
 					log.Println(infop, "Uptime is:", uptime)
 				case strings.Contains(data, "cpuutil"):
 					cpuutil := strings.TrimPrefix(data, "cpuutil:")
-					log.Println(infop, "Uptime is:", cpuutil)
+					log.Println(infop, "CPU utilisation is:", cpuutil)
 				case strings.Contains(data, "ramutil"):
 					ramutil := strings.TrimPrefix(data, "ramutil:")
-					log.Println(infop, "Uptime is:", ramutil)
+					log.Println(infop, "RAM utilisation is:", ramutil)
 				default:
 					log.Println(errop, "Received data was not defined:", data)
 				}
