@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -34,6 +35,15 @@ type agentMessage struct {
 
 func initHTTP() {
 	NMTA := mux.NewRouter().StrictSlash(true)
+	httpServer := &http.Server{
+		Addr:    (":" + listenPortHttp), // Specify the desired HTTPS port
+		Handler: NMTA,
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{ // Load the certificate and private key
+				loadTLSCertificate("restapi.crt", "restapi.key"),
+			},
+		},
+	}
 
 	//Basic endpoints
 	NMTA.HandleFunc("/", rootEnd).Methods("GET")
@@ -46,8 +56,8 @@ func initHTTP() {
 	NMTA.HandleFunc("/agent/register", agentMani("register")).Methods("POST")
 	NMTA.HandleFunc("/agent/deregister", agentMani("deregister")).Methods("DELETE")
 
-	go http.ListenAndServe((":" + listenPortHttp), NMTA)
-	log.Println(infop, "NMTAS HTTP REST-API, Ready for connections on port:", listenPortHttp)
+	go httpServer.ListenAndServeTLS("", "")
+	log.Println(infop, "NMTAS HTTPS REST-API, Ready for connections on port:", listenPortHttp)
 }
 
 func rootEnd(w http.ResponseWriter, r *http.Request) {
@@ -65,16 +75,16 @@ func accountMani(command string) http.HandlerFunc {
 		var requestBody accountMessage
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(err.Error())
-		} else {
+			json.NewEncoder(w).Encode(err)
+		} else if requestBody.Username != adminUsername {
 			switch command {
 			case "create": //Create a new account and store the given password (or password hash) securely with an added salt using SHA3-512.
-				if createAccount(requestBody.Username, requestBody.Password) {
+				if createAccount(requestBody.Username, requestBody.Password, requestBody.Option) {
 					w.WriteHeader(http.StatusOK)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: ("Successfully created an account for user: " + requestBody.Username + ".")}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusConflict)
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusConflict, Message: "Creation failed, user: " + requestBody.Username + " exists."}) //Using the predefined struct above we respond in JSON to the request.
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusConflict, Message: "Creation failed, user: " + requestBody.Username + " exists. Or the create token is incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			case "change":
 				if changeAccount(requestBody.Username, requestBody.Password, requestBody.Option) {
@@ -98,6 +108,10 @@ func accountMani(command string) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: userToken}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			}
+		} else {
+			log.Println(warnp, "Received calls for actions regarding the admin user.")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Dropping requests for the admin user."})
 		}
 	}
 }
@@ -118,8 +132,7 @@ func agentMani(command string) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Succesfully registered agent to manager."}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					log.Println("Unauthorized")
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access token was incorrect or manager account does not exist."}) //Using the predefined struct above we respond in JSON to the request.
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Access token was incorrect, manager account does not exist or agent is a duplicate."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			case "deregister":
 				//deregisterAgent(requestBody.AgentHostname, requestBody.AgentOS)

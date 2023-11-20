@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"strings"
@@ -12,17 +13,38 @@ const (
 	errop = "[Error]"
 
 	JOINTOKEN_LEN = 100
+
+	adminUsername = "admin"
 )
 
 func init() {
 	log.Println(strings.Repeat("-", 100))
 	initDB()
+	createAdminAccount()
 	go initTLS()
 	go initHTTP()
 }
 
 func main() {
 	fmt.Scanln()
+}
+
+func createAdminAccount() {
+	adminToken := generateRandomString(JOINTOKEN_LEN)
+	if status := insertAccount(adminUsername, "", "", adminToken); status {
+		log.Println(infop, "Inserted Admin account.")
+		log.Println(infop, adminToken)
+	} else {
+		log.Println(infop, "Admin account already exists")
+	}
+}
+
+func loadTLSCertificate(certFile, keyFile string) tls.Certificate {
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return cert
 }
 
 func authenticateAccount(username, password string) bool {
@@ -41,16 +63,24 @@ func authenticateAccount(username, password string) bool {
 	}
 }
 
-func createAccount(username, password string) bool {
+func checkIfAgentExists(remoteIP string) bool {
+	return retrieveAmountOfAgents(remoteIP) > 0
+}
+
+func createAccount(username, password, option string) bool {
 	log.Println(infop, "Received request for account creation, user:", username+".")
 	securedPassword, randomSalt := securePassword(password)
 	joinToken := generateRandomString(JOINTOKEN_LEN)
-	if status := insertAccount(username, securedPassword, randomSalt, joinToken); status {
-		log.Println(infop, "Successfully created account for user:", username+".")
-		return status
+	if option == retrieveUserToken(adminUsername) {
+		if status := insertAccount(username, securedPassword, randomSalt, joinToken); status {
+			log.Println(infop, "Successfully created account for user:", username+".")
+			return status
+		} else {
+			log.Println(warnp, "Failed to create account because of duplicate username.")
+			return status
+		}
 	} else {
-		log.Println(warnp, "Failed to create account because of duplicate username.")
-		return status
+		return false
 	}
 }
 
@@ -60,7 +90,7 @@ func changeAccount(username, password, option string) bool {
 		log.Println(infop, "Passwords match, user:", username, "authenticated.")
 		securedPassword, randomSalt := securePassword(option)
 		alterAccount(username, securedPassword, randomSalt)
-		log.Println(infop, "Account alteration succesful, altered password for user:", username+".")
+		log.Println(infop, "Account alteration successful, altered password for user:", username+".")
 		return true
 	} else {
 		log.Println(warnp, "Passwords do not match or user does not exist, access denied.")
@@ -73,7 +103,7 @@ func removeAccount(username, password string) bool {
 	if authenticateAccount(username, password) {
 		log.Println(infop, "Passwords match, user:", username, "authenticated.")
 		dropAccount(username)
-		log.Println(infop, "Account deletion succesful, removed user:", username+".")
+		log.Println(infop, "Account deletion successful, removed user:", username+".")
 		return true
 	} else {
 		log.Println(warnp, "Passwords do not match or user does not exist, access denied.")
@@ -98,6 +128,15 @@ func registerAgent(agentManager, candidateAccessToken, agentHostname, agentOS, a
 		} else {
 			return false
 		}
+	} else {
+		return false
+	}
+}
+
+func checkIfAllowedIP(remoteIP string) bool {
+	if checkIfAgentExists(remoteIP) {
+		log.Println(infop, "Agent exists in database and is allowed, accepting connection.")
+		return true
 	} else {
 		return false
 	}

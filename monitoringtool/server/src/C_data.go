@@ -7,7 +7,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var db *sql.DB
+var (
+	db *sql.DB
+)
 
 const (
 	userTable = `
@@ -62,6 +64,12 @@ func checkDuplicate(keyword, columnname, table string) bool {
 	}
 }
 
+func retrieveAmountOfAgents(remoteIP string) int {
+	var counter int
+	db.QueryRow("SELECT COUNT(*) FROM " + agentTableName + " WHERE ipAddress = '" + remoteIP + "';").Scan(&counter)
+	return counter
+}
+
 func retrieveSalt(username string) (bool, string) {
 	var randomSalt string
 	db.QueryRow("SELECT salt FROM users WHERE user = '" + username + "';").Scan(&randomSalt)
@@ -107,7 +115,7 @@ func dropAccount(username string) {
 }
 
 func insertAgent(agentManager, agentHostname, agentOS, agentIP, signupDate string) bool {
-	if !checkDuplicate(agentHostname, agentColumnHost, agentTable) {
+	if !checkDuplicate(agentHostname, agentColumnHost, agentTableName) && agentManager != adminUsername { //Check if the requested registration is not a duplicate and to deny people trying to assign to the admin account.
 		stmnt, _ := db.Prepare("INSERT INTO agents (manager, hostname, operatingSystem, ipAddress, signupDate) VALUES (?, ?, ?, ?, ?);")
 		defer stmnt.Close()
 		stmnt.Exec(agentManager, agentHostname, agentOS, agentIP, signupDate)
