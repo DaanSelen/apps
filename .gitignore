@@ -1,4 +1,4 @@
 monitoringtool/server/*.db
 monitoringtool/server/src/*.db
-monitoringtool/server/certs/*.crt
-monitoringtool/server/certs/*.key
+*.key
+*.crt
