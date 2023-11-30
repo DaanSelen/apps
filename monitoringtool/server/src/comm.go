@@ -9,8 +9,8 @@ import (
 
 const (
 	listenAddrTls    string = "0.0.0.0:9114"
-	tcpServerTLSCert string = "../certs/tls.crt"
-	tcpServerTLSKey  string = "../certs/tls.key"
+	tcpServerTLSCert string = "./certs/tls.crt"
+	tcpServerTLSKey  string = "./certs/tls.key"
 )
 
 func initTLS() {

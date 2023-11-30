@@ -11,8 +11,8 @@ import (
 
 const (
 	listenAddrHttp string = "0.0.0.0:9113"
-	restApiTLSCert string = "../certs/restapi.crt"
-	restApiTLSKey  string = "../certs/restapi.key"
+	restApiTLSCert string = "./certs/restapi.crt"
+	restApiTLSKey  string = "./certs/restapi.key"
 )
 
 type infoMessage struct {

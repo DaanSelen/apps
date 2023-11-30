@@ -4,7 +4,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 const (
@@ -26,7 +29,18 @@ func init() {
 }
 
 func main() {
-	fmt.Scanln()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+
+	// Your program logic here
+
+	// Wait for signals
+	<-signals
+	fmt.Println("Received signal. Exiting...")
+	// Add your cleanup logic here
+
+	// Exit the program
+	os.Exit(0)
 }
 
 func createAdminAccount() {
