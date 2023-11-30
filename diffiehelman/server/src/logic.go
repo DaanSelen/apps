@@ -13,7 +13,7 @@ const (
 )
 
 func main() {
-	var address string = "192.168.178.30:6800"
+	const address string = "192.168.178.30:6800"
 
 	s, _ := net.ResolveUDPAddr("udp4", address)
 	connection, _ := net.ListenUDP("udp4", s)

@@ -14,11 +14,11 @@ const (
 )
 
 func initTLS() {
-	config := &tls.Config{
+	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{loadTLSCertificate(tcpServerTLSCert, tcpServerTLSKey)},
 	}
 
-	listener, err := tls.Listen("tcp", ":"+listenPortTls, config)
+	listener, err := tls.Listen("tcp", ":"+listenPortTls, tlsConfig)
 	if err != nil {
 		log.Println("Error starting server:", err)
 		return

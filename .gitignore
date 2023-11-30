@@ -1,5 +1,4 @@
 monitoringtool/server/*.db
 monitoringtool/server/src/*.db
-monitoringtool/server/*.crt
-monitoringtool/server/*.csr
-monitoringtool/server/*.key
+monitoringtool/server/certs/*.crt
+monitoringtool/server/certs/*.key

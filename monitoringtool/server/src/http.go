@@ -67,7 +67,7 @@ func rootEnd(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	log.Println(infop, "ROOT HIT") //Comment out later, for debugging purposes
-	json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Nerthus Monitor Application Server REST-API. Version 0.01"})
+	json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: "Nerthus Monitor Application Server REST-API. Version 0.3.0"})
 }
 
 func accountMani(command int) http.HandlerFunc {
@@ -128,7 +128,7 @@ func agentMani(command string) http.HandlerFunc {
 		var requestBody agentMessage
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(err.Error())
+			json.NewEncoder(w).Encode(err)
 		} else {
 			switch command {
 			case "register":
