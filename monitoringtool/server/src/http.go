@@ -38,7 +38,7 @@ type agentMessage struct {
 func initHTTP() {
 	NMTA := mux.NewRouter().StrictSlash(true)
 	httpServer := &http.Server{
-		Addr:    (":" + listenPortHttp), // Specify the desired HTTPS port
+		Addr:    ("0.0.0.0:" + listenPortHttp), // Specify the desired HTTPS port
 		Handler: NMTA,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{ // Load the certificate and private key
