@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	listenPortHttp string = "0.0.0.0:9113"
+	listenAddrHttp string = "0.0.0.0:9113"
 	restApiTLSCert string = "../certs/restapi.crt"
 	restApiTLSKey  string = "../certs/restapi.key"
 )
@@ -38,7 +38,7 @@ type agentMessage struct {
 func initHTTP() {
 	NMTA := mux.NewRouter().StrictSlash(true)
 	httpServer := &http.Server{
-		Addr:    (listenAddrTls), // Specify the desired HTTPS port
+		Addr:    (listenAddrHttp), // Specify the desired HTTPS port
 		Handler: NMTA,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{ // Load the certificate and private key
@@ -59,7 +59,7 @@ func initHTTP() {
 	NMTA.HandleFunc("/agent/deregister", agentMani("deregister")).Methods("DELETE")
 
 	go httpServer.ListenAndServeTLS("", "")
-	log.Println(infop, "NMTAS HTTPS REST-API, Ready for connections on port:", listenPortHttp)
+	log.Println(infop, "NMTAS HTTPS REST-API, Ready for connections on port:", listenAddrHttp)
 }
 
 func rootEnd(w http.ResponseWriter, r *http.Request) {
