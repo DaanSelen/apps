@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	listenPortHttp string = "9113"
+	listenPortHttp string = "0.0.0.0:9113"
 	restApiTLSCert string = "../certs/restapi.crt"
 	restApiTLSKey  string = "../certs/restapi.key"
 )
@@ -38,7 +38,7 @@ type agentMessage struct {
 func initHTTP() {
 	NMTA := mux.NewRouter().StrictSlash(true)
 	httpServer := &http.Server{
-		Addr:    ("0.0.0.0:" + listenPortHttp), // Specify the desired HTTPS port
+		Addr:    (listenAddrTls), // Specify the desired HTTPS port
 		Handler: NMTA,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{ // Load the certificate and private key

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	listenPortTls    string = "0.0.0.0:9114"
+	listenAddrTls    string = "0.0.0.0:9114"
 	tcpServerTLSCert string = "../certs/tls.crt"
 	tcpServerTLSKey  string = "../certs/tls.key"
 )
@@ -18,14 +18,14 @@ func initTLS() {
 		Certificates: []tls.Certificate{loadTLSCertificate(tcpServerTLSCert, tcpServerTLSKey)},
 	}
 
-	listener, err := tls.Listen("tcp4", ":"+listenPortTls, tlsConfig)
+	listener, err := tls.Listen("tcp4", listenAddrTls, tlsConfig)
 	if err != nil {
 		log.Println("Error starting server:", err)
 		return
 	}
 	defer listener.Close()
 
-	log.Println(infop, "NMTAS TLS-Server, Ready for connections on port:", listenPortTls)
+	log.Println(infop, "NMTAS TLS-Server, Ready for connections on port:", listenAddrTls)
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
