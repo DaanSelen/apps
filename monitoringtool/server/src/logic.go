@@ -31,15 +31,8 @@ func init() {
 func main() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
-
-	// Your program logic here
-
-	// Wait for signals
 	<-signals
 	fmt.Println("Received signal. Exiting...")
-	// Add your cleanup logic here
-
-	// Exit the program
 	os.Exit(0)
 }
 
@@ -146,6 +139,14 @@ func registerAgent(agentManager, candidateAccessToken, agentHostname, agentOS, a
 		return false
 	}
 }
+
+/*func deregisterAgent() {
+
+}*/
+
+/*func registerAgentData() {
+
+}*/
 
 func checkIfAllowedIP(remoteIP string) bool {
 	if checkIfAgentExists(remoteIP) {
