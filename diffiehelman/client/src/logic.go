@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+const (
+	minInitVal = 200
+	maxInitVal = 1000
+)
+
 var (
 	B *big.Int
 )
@@ -56,9 +61,9 @@ func readRespone(conn *net.UDPConn) {
 }
 
 func initDiffie(conn *net.UDPConn) {
-	a, _ := generateRandomPrime(big.NewInt(50), big.NewInt(200))
-	g, _ := generateRandomPrime(big.NewInt(50), big.NewInt(200))
-	p, _ := generateRandomPrime(big.NewInt(100), big.NewInt(200))
+	a, _ := generateRandomPrime(big.NewInt(minInitVal), big.NewInt(maxInitVal))
+	g, _ := generateRandomPrime(big.NewInt(minInitVal), big.NewInt(maxInitVal))
+	p, _ := generateRandomPrime(big.NewInt(minInitVal), big.NewInt(maxInitVal))
 
 	A := new(big.Int).Exp(g, a, p)
 

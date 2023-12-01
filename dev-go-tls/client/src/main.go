@@ -8,18 +8,13 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: client <server-hostname>")
-		os.Exit(1)
-	}
-
-	serverAddr := "localhost"
+	serverAddr := "192.168.178.30"
 
 	config := &tls.Config{
 		InsecureSkipVerify: true, // For self-signed certificates, in a production environment, set this to false and provide valid CA certificates.
 	}
 
-	conn, err := tls.Dial("tcp", serverAddr+":6942", config)
+	conn, err := tls.Dial("tcp", serverAddr+":9114", config)
 	if err != nil {
 		fmt.Println("Error connecting to server:", err)
 		return
