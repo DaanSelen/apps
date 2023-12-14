@@ -67,7 +67,7 @@ func checkDuplicate(keyword, columnname, table string) bool {
 	query := "SELECT COUNT(*) FROM " + table + " WHERE " + columnname + " = ?;"
 	err := db.QueryRow(query, keyword).Scan(&counter)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 		return false
 	}
 	return counter > 0
@@ -78,7 +78,7 @@ func retrieveAmountOfAgents(remoteIP string) int {
 	query := "SELECT COUNT(*) FROM " + agentTableName + " WHERE ipAddress = ?;"
 	err := db.QueryRow(query, remoteIP).Scan(&counter)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 	}
 	return counter
 }
@@ -88,7 +88,7 @@ func retrieveSalt(username string) (bool, string) {
 	query := "SELECT salt FROM users WHERE user = ?;"
 	err := db.QueryRow(query, username).Scan(&randomSalt)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 		return false, "Failed to find user: " + username
 	}
 	return true, randomSalt
@@ -99,7 +99,7 @@ func retrievePasswordhash(username string) string {
 	query := "SELECT password FROM users WHERE user = ?;"
 	err := db.QueryRow(query, username).Scan(&passwordHash)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 	}
 	return passwordHash
 }
@@ -109,7 +109,7 @@ func retrieveUserToken(username string) string {
 	query := "SELECT accessToken FROM users WHERE user = ?;"
 	err := db.QueryRow(query, username).Scan(&accessToken)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 	}
 	return accessToken
 }
@@ -119,7 +119,7 @@ func insertAccount(username, securedPassword, randomSalt, joinToken string) bool
 		query := "INSERT INTO users (user, password, salt, accessToken) VALUES (?, ?, ?, ?);"
 		_, err := db.Exec(query, username, securedPassword, randomSalt, joinToken)
 		if err != nil {
-			log.Println("Error executing query:", err)
+			log.Println(errop, "Executing query:", err)
 			return false
 		}
 		return true
@@ -131,7 +131,7 @@ func alterAccount(username, password, randomSalt string) {
 	query := "UPDATE users SET password = ?, salt = ? WHERE user = ?;"
 	_, err := db.Exec(query, password, randomSalt, username)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 	}
 }
 
@@ -139,7 +139,7 @@ func dropAccount(username string) {
 	query := "DELETE FROM users WHERE user = ?;"
 	_, err := db.Exec(query, username)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Println(errop, "Executing query:", err)
 	}
 }
 
@@ -148,7 +148,7 @@ func insertAgent(agentManager, agentHostname, agentOS, agentIP, signupDate strin
 		query := "INSERT INTO agents (manager, hostname, operatingSystem, ipAddress, signupDate) VALUES (?, ?, ?, ?, ?);"
 		_, err := db.Exec(query, agentManager, agentHostname, agentOS, agentIP, signupDate)
 		if err != nil {
-			log.Println("Error executing query:", err)
+			log.Println(errop, "Executing query:", err)
 			return false
 		}
 		return true
