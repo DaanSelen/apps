@@ -119,7 +119,7 @@ func accountMani(command int) http.HandlerFunc {
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: totpToken}) //Using the predefined struct above we respond in JSON to the request.
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Retrieval of totp code failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Retrieval of multifactor code failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
 			}
 		} else {

@@ -129,7 +129,7 @@ func getUserToken(username, password string) (bool, string) {
 }
 
 func getMFAToken(username, password string) (bool, string) {
-	log.Println(infop, "Received request for retrieval of accesstoken for user:", username+".")
+	log.Println(infop, "Received request for retrieval of multifactor for user:", username+".")
 	if authenticateAccount(username, password) {
 		return true, getCode()
 	} else {
