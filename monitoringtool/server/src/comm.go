@@ -51,7 +51,7 @@ func handleConnection(conn net.Conn) {
 				break
 			} else {
 				switch {
-				case strings.Contains(data, "verifymfa"):
+				case strings.Contains(data, "mfa"):
 					mfaCode := strings.TrimPrefix(data, "mfa:")
 					if verifyMFACode(mfaCode) {
 						conn.Write([]byte("SUCCESS"))
