@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"crypto/tls"
 	"fmt"
+	"log"
 	"os"
 )
 
 func main() {
-	serverAddr := "192.168.178.30"
+	serverAddr := "212.124.66.17"
 
 	config := &tls.Config{
 		InsecureSkipVerify: true, // For self-signed certificates, in a production environment, set this to false and provide valid CA certificates.
@@ -39,6 +40,13 @@ func main() {
 		// You can also implement logic to exit the loop based on some condition (e.g., type "exit")
 		if message == "exit" {
 			break
+		}
+
+		for { // Example: Read data from the connection
+			buffer := make([]byte, 1024)
+			n, _ := conn.Read(buffer)
+			data := string(buffer[:n])
+			log.Println(data)
 		}
 	}
 }
