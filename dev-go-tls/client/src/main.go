@@ -46,5 +46,6 @@ func main() {
 		n, _ := conn.Read(buffer)
 		data := string(buffer[:n])
 		log.Println(data)
+		break
 	}
 }
