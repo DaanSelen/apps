@@ -26,6 +26,7 @@ func init() {
 	go createAdminAccount()
 	go initTLS()
 	go initHTTP()
+	go initTOTP()
 }
 
 func main() {
@@ -125,6 +126,20 @@ func getUserToken(username, password string) (bool, string) {
 	} else {
 		return false, ""
 	}
+}
+
+func getMFAToken(username, password string) (bool, string) {
+	log.Println(infop, "Received request for retrieval of multifactor for user:", username+".")
+	if authenticateAccount(username, password) {
+		return true, getCode()
+	} else {
+		return false, ""
+	}
+}
+
+func verifyMFACode(candidate string) bool {
+	mfaCode := getCode()
+	return candidate == mfaCode
 }
 
 func registerAgent(agentManager, candidateAccessToken, agentHostname, agentOS, agentIP, agentSignDate string) bool {

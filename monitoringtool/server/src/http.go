@@ -54,6 +54,7 @@ func initHTTP() {
 	NMTA.HandleFunc("/account/change", accountMani(2)).Methods("PATCH")
 	NMTA.HandleFunc("/account/remove", accountMani(3)).Methods("DELETE")
 	NMTA.HandleFunc("/account/accesstoken", accountMani(4)).Methods("GET")
+	NMTA.HandleFunc("/account/mfa", accountMani(5)).Methods("GET")
 	//Agent register endpoint
 	NMTA.HandleFunc("/agent/register", agentMani("register")).Methods("POST")
 	NMTA.HandleFunc("/agent/deregister", agentMani("deregister")).Methods("DELETE")
@@ -112,9 +113,17 @@ func accountMani(command int) http.HandlerFunc {
 					w.WriteHeader(http.StatusUnauthorized)
 					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Retrieval of access code failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
 				}
+			case 5:
+				if status, totpToken := getMFAToken(requestBody.Username, requestBody.Password); status {
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusOK, Message: totpToken}) //Using the predefined struct above we respond in JSON to the request.
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Retrieval of multifactor code failed, user does not exist or credentials are incorrect."}) //Using the predefined struct above we respond in JSON to the request.
+				}
 			}
 		} else {
-			log.Println(warnp, "Received calls for actions regarding the admin user.")
+			log.Println(warnp, "Received calls for actions regarding the admin user, dropping.")
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Dropping requests for the admin user."})
 		}
