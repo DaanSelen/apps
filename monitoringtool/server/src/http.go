@@ -123,7 +123,7 @@ func accountMani(command int) http.HandlerFunc {
 				}
 			}
 		} else {
-			log.Println(warnp, "Received calls for actions regarding the admin user.")
+			log.Println(warnp, "Received calls for actions regarding the admin user, dropping.")
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(infoMessage{Code: http.StatusUnauthorized, Message: "Dropping requests for the admin user."})
 		}
