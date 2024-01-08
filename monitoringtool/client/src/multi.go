@@ -29,10 +29,10 @@ func checkMfa(mfaCand string) bool {
 	}
 }
 
-func lockPathVerify() {
-	if confVal[1] == "" {
+func lockPathVerify() { //CONFVAL DIRECTORY
+	if confVal[2] == "" {
 		log.Println("Default lockpath chosen")
-	} else if strings.HasPrefix(confVal[1], "/") {
+	} else if strings.HasPrefix(confVal[2], "/") {
 		log.Println("Custom lockpath chosen")
 		lockpath = confVal[1]
 	}

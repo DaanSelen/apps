@@ -16,7 +16,12 @@ var (
 
 func init() {
 	configFile := "./config.txt"
-	configWords := []string{"manager_ip", "lock_dir"}
+	configWords := []string{
+		"manager_ip",
+		"uptime_on",
+		"lock_dir",
+		"mon_interval",
+	}
 	searchKeywords(configFile, configWords)
 	conn = initConn()
 }
@@ -27,11 +32,11 @@ func main() {
 	flag.Parse()
 
 	if checkMfa(mfaFlag) {
-		subroutine()
+		startSubroutine()
 	}
 }
 
-func searchKeywords(filepath string, keywords []string) {
+func searchKeywords(filepath string, keywords []string) { //CONFVAL DIRECTORY
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +57,7 @@ func searchKeywords(filepath string, keywords []string) {
 	}
 }
 
-func initConn() *tls.Conn {
+func initConn() *tls.Conn { //CONFVAL DIRECTORY
 	config := &tls.Config{
 		InsecureSkipVerify: true, // For self-signed certificates, in a production environment, set this to false and provide valid CA certificates.
 	}
